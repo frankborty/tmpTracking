@@ -17,11 +17,22 @@
 
 #include <array>
 
-#if defined(TRACKINGITSU_CUDA_COMPILE)
+#if defined(TRACKINGITSU_CUDA_COMPILE) || defined (TRACKINGITSU_OPEN_CL_COMPILE)
 # define TRACKINGITSU_GPU_MODE true
 #else
 # define TRACKINGITSU_GPU_MODE false
 #endif
+
+#if defined(TRACKINGITSU_OPEN_CL_COMPILE)
+#define __CL_ENABLE_EXCEPTIONS //enable exceptions
+#include <CL/cl.hpp>
+# define TRACKINGITSU_OCL_MODE true
+# define TRACKINGITSU_CUDA_MODE false
+#elif(TRACKINGITSU_CUDA_COMPILE)
+# define TRACKINGITSU_OCL_MODE false
+# define TRACKINGITSU_CUDA_MODE true
+#endif
+
 
 #if defined(__CUDACC__)
 # define TRACKINGITSU_GPU_COMPILING

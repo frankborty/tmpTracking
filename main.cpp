@@ -16,6 +16,11 @@
 # include "ITSReconstruction/CA/gpu/Utils.h"
 #endif
 
+#if TRACKINGITSU_OCL_MODE
+#include "ITSReconstruction/CA/openCl/Utils.h"
+#include "ITSReconstruction/CA/openCl/Context.h"
+#endif
+
 using namespace o2::ITS::CA;
 
 std::string getDirectory(const std::string& fname)
@@ -26,12 +31,21 @@ std::string getDirectory(const std::string& fname)
 
 int main(int argc, char** argv)
 {
+#if TRACKINGITSU_OCL_MODE
+	std::cout<<">> OCL"<<std::endl;
+#elif TRACKINGITSU_CUDA_MODE
+	std::cout<<">> CUDA"<<std::endl;
+#else
+	std::cout<<">> CPU"<<std::endl;
+#endif
+
+  o2::ITS::CA::GPU::Context context;
   if (argv[1] == NULL) {
 
     std::cerr << "Please, provide a data file." << std::endl;
     exit(EXIT_FAILURE);
   }
-
+  return 1;
   std::string eventsFileName(argv[1]);
   std::string benchmarkFolderName = getDirectory(eventsFileName);
   std::vector<Event> events = IOUtils::loadEventData(eventsFileName);
