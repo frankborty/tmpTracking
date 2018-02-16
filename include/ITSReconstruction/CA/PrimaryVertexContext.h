@@ -27,9 +27,12 @@
 #include "ITSReconstruction/CA/Road.h"
 #include "ITSReconstruction/CA/Tracklet.h"
 
-#if TRACKINGITSU_GPU_MODE
-# include "ITSReconstruction/CA/gpu/PrimaryVertexContext.h"
-# include "ITSReconstruction/CA/gpu/UniquePointer.h"
+#if TRACKINGITSU_CUDA_MODE
+	#include "ITSReconstruction/CA/gpu/PrimaryVertexContext.h"
+	#include "ITSReconstruction/CA/gpu/UniquePointer.h"
+	#endif
+#if TRACKINGITSU_OCL_MODE
+	#include "ITSReconstruction/CA/openCl/PrimaryVertexContext.h"
 #endif
 
 namespace o2
@@ -57,6 +60,7 @@ class PrimaryVertexContext
         std::vector<Road>& getRoads();
 
 #if TRACKINGITSU_GPU_MODE
+	#if TRACKINGITSU_CUDA_MODE
         GPU::PrimaryVertexContext& getDeviceContext();
         GPU::Array<GPU::Vector<Cluster>, Constants::ITS::LayersNumber>& getDeviceClusters();
         GPU::Array<GPU::Vector<Tracklet>, Constants::ITS::TrackletsPerRoad>& getDeviceTracklets();
@@ -69,13 +73,13 @@ class PrimaryVertexContext
         std::array<GPU::Vector<Tracklet>, Constants::ITS::CellsPerRoad>& getTempTrackletArray();
         std::array<GPU::Vector<Cell>, Constants::ITS::CellsPerRoad - 1>& getTempCellArray();
         void updateDeviceContext();
+	#endif
 #else
         std::array<std::array<int, Constants::IndexTable::ZBins * Constants::IndexTable::PhiBins + 1>,
             Constants::ITS::TrackletsPerRoad>& getIndexTables();
         std::array<std::vector<Tracklet>, Constants::ITS::TrackletsPerRoad>& getTracklets();
         std::array<std::vector<int>, Constants::ITS::CellsPerRoad>& getTrackletsLookupTable();
 #endif
-
       private:
         float3 mPrimaryVertex;
         std::array<std::vector<Cluster>, Constants::ITS::LayersNumber> mClusters;
@@ -85,11 +89,16 @@ class PrimaryVertexContext
         std::vector<Road> mRoads;
 
 #if TRACKINGITSU_GPU_MODE
+#if TRACKINGITSU_CUDA_MODE
         GPU::PrimaryVertexContext mGPUContext;
         GPU::UniquePointer<GPU::PrimaryVertexContext> mGPUContextDevicePointer;
         std::array<GPU::Vector<int>, Constants::ITS::CellsPerRoad> mTempTableArray;
         std::array<GPU::Vector<Tracklet>, Constants::ITS::CellsPerRoad> mTempTrackletArray;
         std::array<GPU::Vector<Cell>, Constants::ITS::CellsPerRoad - 1> mTempCellArray;
+#endif
+#if TRACKINGITSU_OCL_MODE
+        GPU::PrimaryVertexContext mGPUContext;
+#endif
 #else
         std::array<std::array<int, Constants::IndexTable::ZBins * Constants::IndexTable::PhiBins + 1>,
             Constants::ITS::TrackletsPerRoad> mIndexTables;
@@ -128,7 +137,7 @@ class PrimaryVertexContext
       return mRoads;
     }
 
-#if TRACKINGITSU_GPU_MODE
+#if TRACKINGITSU_CUDA_MODE
     inline GPU::PrimaryVertexContext& PrimaryVertexContext::getDeviceContext()
     {
       return *mGPUContextDevicePointer;
@@ -188,6 +197,9 @@ class PrimaryVertexContext
     {
       mGPUContextDevicePointer = GPU::UniquePointer<GPU::PrimaryVertexContext> { mGPUContext };
     }
+#elif TRACKINGITSU_OCL_MODE
+
+
 #else
     inline std::array<std::array<int, Constants::IndexTable::ZBins * Constants::IndexTable::PhiBins + 1>,
         Constants::ITS::TrackletsPerRoad>& PrimaryVertexContext::getIndexTables()

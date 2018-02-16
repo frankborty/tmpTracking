@@ -38,21 +38,20 @@ Context::Context()
 	std::size_t iPlatformList;
 	std::size_t iTotalDevice=0;
 	int scelta=0;
-	mDevicesNum=0;
+
 	try{
 
 		// Get the list of platform
 		cl::Platform::get(&platformList);
-		platformList.clear();
-	//	iPlatformList=platformList.size();
+		iPlatformList=platformList.size();
 		// Pick first platform
 
 		//std::cout << "There are " << iPlatformList << " platform" << std::endl;
 		//std::cout << std::endl;
-		/*			for(int iPlatForm=0;iPlatForm<(int)iPlatformList;iPlatForm++){
+		for(int iPlatForm=0;iPlatForm<(int)iPlatformList;iPlatForm++){
 			//std::cout << "Platform #" << iPlatForm+1 << std::endl;
 			cl::Context context;
-		try{
+			try{
 				cl_context_properties cprops[] = {
 				CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[iPlatForm])(), 0};
 				context=cl::Context(CL_DEVICE_TYPE_ALL, cprops);
@@ -77,9 +76,9 @@ Context::Context()
 			platformList[iPlatForm].getDevices(CL_DEVICE_TYPE_ALL,&deviceList);
 			mDevicesNum=deviceList.size();
 			mDeviceProperties.resize(iTotalDevice+mDevicesNum, DeviceProperties { });
-*/
+
 			//std::cout << "There are " << mDevicesNum << " devices" << std::endl;
-/*
+
 			for(int iDevice=0;iDevice<mDevicesNum;iDevice++){
 
 				std::string name;
@@ -138,13 +137,13 @@ Context::Context()
 			}
 
 		}
-/*		std::cout<<"total Device: "<<iTotalDevice<<std::endl;
+		std::cout<<"total Device: "<<iTotalDevice<<std::endl;
 		for(uint j=0;j<iTotalDevice;j++){
 			std::cout<<"["<<j<<"]"<<mDeviceProperties[j].name<<std::endl;
 		}
 		std::cout<<"Choose device:";
 		std::cin>>scelta;
-*/
+
 	}
 	catch(const cl::Error &err){
 		std::string errString=Utils::OCLErr_code(err.err());
@@ -152,7 +151,7 @@ Context::Context()
 	}
 
 	iCurrentDevice=scelta;
-/*
+
 	try{
 		mDeviceProperties[iCurrentDevice].oclQueue=cl::CommandQueue(mDeviceProperties[iCurrentDevice].oclContext, mDeviceProperties[iCurrentDevice].oclDevice, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE|CL_QUEUE_PROFILING_ENABLE );
 		mDeviceProperties[iCurrentDevice].oclCountKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","countLayerTracklets");
@@ -163,7 +162,7 @@ Context::Context()
 			throw std::runtime_error { errString };
 		}
 
-*/
+
 }
 
 

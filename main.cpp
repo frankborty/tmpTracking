@@ -39,13 +39,13 @@ int main(int argc, char** argv)
 	std::cout<<">> CPU"<<std::endl;
 #endif
 
-  o2::ITS::CA::GPU::Context context;
+
   if (argv[1] == NULL) {
 
     std::cerr << "Please, provide a data file." << std::endl;
     exit(EXIT_FAILURE);
   }
-  return 1;
+
   std::string eventsFileName(argv[1]);
   std::string benchmarkFolderName = getDirectory(eventsFileName);
   std::vector<Event> events = IOUtils::loadEventData(eventsFileName);

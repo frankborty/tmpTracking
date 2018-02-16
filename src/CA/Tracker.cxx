@@ -404,13 +404,13 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksTimeBenchmark(
 template<bool IsGPU>
 void Tracker<IsGPU>::computeTracklets()
 {
-  Trait::computeLayerTracklets(mPrimaryVertexContext);
+  //Trait::computeLayerTracklets(mPrimaryVertexContext);
 }
 
 template<bool IsGPU>
 void Tracker<IsGPU>::computeCells()
 {
-  Trait::computeLayerCells(mPrimaryVertexContext);
+  //Trait::computeLayerCells(mPrimaryVertexContext);
 }
 
 template<bool IsGPU>

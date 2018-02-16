@@ -90,6 +90,8 @@ using GPUArray = std::array<T, Size>;
 
 typedef struct _dummyStream {} GPUStream;
 
+
+
 #endif
 
 #endif /* TRACKINGITSU_INCLUDE_CADEFINITIONS_H_ */
