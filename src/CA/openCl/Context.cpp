@@ -141,21 +141,21 @@ Context::Context()
 		for(uint j=0;j<iTotalDevice;j++){
 			std::cout<<"["<<j<<"]"<<mDeviceProperties[j].name<<std::endl;
 		}
-		std::cout<<"Choose device:";
-		std::cin>>scelta;
+		//std::cout<<"Choose device:";
+		//std::cin>>scelta;
 
 	}
 	catch(const cl::Error &err){
 		std::string errString=Utils::OCLErr_code(err.err());
 		throw std::runtime_error { errString };
 	}
-
+	scelta=0;
 	iCurrentDevice=scelta;
 
 	try{
 		mDeviceProperties[iCurrentDevice].oclQueue=cl::CommandQueue(mDeviceProperties[iCurrentDevice].oclContext, mDeviceProperties[iCurrentDevice].oclDevice, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE|CL_QUEUE_PROFILING_ENABLE );
-		mDeviceProperties[iCurrentDevice].oclCountKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","countLayerTracklets");
-		mDeviceProperties[iCurrentDevice].oclComputeKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","computeLayerTracklets");
+		//mDeviceProperties[iCurrentDevice].oclCountKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","countLayerTracklets");
+		//mDeviceProperties[iCurrentDevice].oclComputeKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","computeLayerTracklets");
 	}catch(const cl::Error &err){
 			std::string errString=Utils::OCLErr_code(err.err());
 			//std::cout<< errString << std::endl;

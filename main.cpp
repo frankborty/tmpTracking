@@ -39,6 +39,10 @@ int main(int argc, char** argv)
 	std::cout<<">> CPU"<<std::endl;
 #endif
 
+	std::vector<cl::Platform> platformList;
+	// Get the list of platform
+	cl::Platform::get(&platformList);
+return 2;
 
   if (argv[1] == NULL) {
 
@@ -61,7 +65,7 @@ int main(int argc, char** argv)
 
     verticesNum += events[iEvent].getPrimaryVerticesNum();
   }
-
+  std::cout<<"Fine lettura file"<<std::endl;
   if (argv[2] != NULL) {
 
     std::string labelsFileName(argv[2]);
@@ -87,7 +91,7 @@ int main(int argc, char** argv)
   // Prevent cold cache benchmark noise
   Tracker<TRACKINGITSU_GPU_MODE> tracker{};
   tracker.clustersToTracks(events[0]);
-
+return 1;
 #if defined GPU_PROFILING_MODE
   Utils::Host::gpuStartProfiler();
 #endif

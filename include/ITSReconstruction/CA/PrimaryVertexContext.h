@@ -33,6 +33,7 @@
 	#endif
 #if TRACKINGITSU_OCL_MODE
 	#include "ITSReconstruction/CA/openCl/PrimaryVertexContext.h"
+	#include "ITSReconstruction/CA/openCl/Context.h"
 #endif
 
 namespace o2
@@ -95,8 +96,7 @@ class PrimaryVertexContext
         std::array<GPU::Vector<int>, Constants::ITS::CellsPerRoad> mTempTableArray;
         std::array<GPU::Vector<Tracklet>, Constants::ITS::CellsPerRoad> mTempTrackletArray;
         std::array<GPU::Vector<Cell>, Constants::ITS::CellsPerRoad - 1> mTempCellArray;
-#endif
-#if TRACKINGITSU_OCL_MODE
+#elif TRACKINGITSU_OCL_MODE
         GPU::PrimaryVertexContext mGPUContext;
 #endif
 #else

@@ -16,6 +16,8 @@
 
 #include "ITSReconstruction/CA/Event.h"
 
+
+
 namespace o2
 {
 namespace ITS
@@ -29,7 +31,18 @@ PrimaryVertexContext::PrimaryVertexContext()
 }
 
 void PrimaryVertexContext::initialize(const Event& event, const int primaryVertexIndex) {
-  mPrimaryVertex = event.getPrimaryVertex(primaryVertexIndex);
+
+#if TRACKINGITSU_OCL_MODE
+	std::cout<<"initialize primary vertex"<<std::endl;
+	mPrimaryVertex = event.getPrimaryVertex(primaryVertexIndex);
+	cl::Context oclContext=GPU::Context::getInstance().getDeviceProperties().oclContext;
+
+
+
+#endif
+
+#if	!TRACKINGITSU_GPU_MODE
+	mPrimaryVertex = event.getPrimaryVertex(primaryVertexIndex);
 
   for (int iLayer { 0 }; iLayer < Constants::ITS::LayersNumber; ++iLayer) {
 
@@ -83,12 +96,13 @@ void PrimaryVertexContext::initialize(const Event& event, const int primaryVerte
   }
 
   mRoads.clear();
-
-#if TRACKINGITSU_GPU_MODE
-#if TRACKINGITSU_CUDA_MODE
-  mGPUContextDevicePointer = mGPUContext.initialize(mPrimaryVertex, mClusters, mCells, mCellsLookupTable);
 #endif
-#else
+
+ #if TRACKINGITSU_CUDA_MODE
+  	  mGPUContextDevicePointer = mGPUContext.initialize(mPrimaryVertex, mClusters, mCells, mCellsLookupTable);
+#endif
+
+#if !TRACKINGITSU_GPU_MODE
   for (int iLayer { 0 }; iLayer < Constants::ITS::LayersNumber; ++iLayer) {
 
     const int clustersNum = static_cast<int>(mClusters[iLayer].size());

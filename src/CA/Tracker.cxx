@@ -251,7 +251,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
   for (int iVertex { 0 }; iVertex < verticesNum; ++iVertex) {
 
     mPrimaryVertexContext.initialize(event, iVertex);
-
+/*
     computeTracklets();
     computeCells();
     findCellsNeighbours();
@@ -259,6 +259,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
     computeMontecarloLabels();
 
     roads.emplace_back(mPrimaryVertexContext.getRoads());
+    */
   }
 
   return roads;
@@ -283,7 +284,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksVerbose(const Eve
     t2 = clock();
     diff = ((float) t2 - (float) t1) / (CLOCKS_PER_SEC / 1000);
     std::cout << std::setw(2) << " - Context initialized in: " << diff << "ms" << std::endl;
-
+/*
     evaluateTask(&Tracker<IsGPU>::computeTracklets, "Tracklets Finding");
     evaluateTask(&Tracker<IsGPU>::computeCells, "Cells Finding");
     evaluateTask(&Tracker<IsGPU>::findCellsNeighbours, "Neighbours Finding");
@@ -295,6 +296,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksVerbose(const Eve
     std::cout << std::setw(2) << " - Vertex " << iVertex + 1 << " completed in: " << diff << "ms" << std::endl;
 
     roads.emplace_back(mPrimaryVertexContext.getRoads());
+*/
   }
 
   return roads;
@@ -386,7 +388,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksTimeBenchmark(
     diff = ((float) t2 - (float) t1) / (CLOCKS_PER_SEC / 1000);
     total += diff;
     timeBenchmarkOutputStream << diff << "\t";
-
+/*
     total += evaluateTask(&Tracker<IsGPU>::computeTracklets, nullptr, timeBenchmarkOutputStream);
     total += evaluateTask(&Tracker<IsGPU>::computeCells, nullptr, timeBenchmarkOutputStream);
     total += evaluateTask(&Tracker<IsGPU>::findCellsNeighbours, nullptr, timeBenchmarkOutputStream);
@@ -396,6 +398,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksTimeBenchmark(
     timeBenchmarkOutputStream << total << std::endl;
 
     roads.emplace_back(mPrimaryVertexContext.getRoads());
+*/
   }
 
   return roads;
