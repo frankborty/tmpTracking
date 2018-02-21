@@ -97,6 +97,7 @@ class PrimaryVertexContext
         std::array<GPU::Vector<Tracklet>, Constants::ITS::CellsPerRoad> mTempTrackletArray;
         std::array<GPU::Vector<Cell>, Constants::ITS::CellsPerRoad - 1> mTempCellArray;
 #elif TRACKINGITSU_OCL_MODE
+      public:
         GPU::PrimaryVertexContext mGPUContext;
 #endif
 #else

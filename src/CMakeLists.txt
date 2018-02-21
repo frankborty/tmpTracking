@@ -84,6 +84,7 @@ if(TRACKINGITSU_TARGET_DEVICE STREQUAL OPEN_CL)
 		CA/openCl/Context.cpp
 		CA/openCl/Utils.cpp
 		CA/openCl/PrimaryVertexContext.cpp
+		CA/openCl/Tracker.cpp
 	)
 	configure_file(CA/openCl/kernel/computeLayerTracklets.cl ${CMAKE_CURRENT_BINARY_DIR}/kernel/computeLayerTracklets.cl COPYONLY)
 	configure_file(CA/openCl/kernel/computeLayerCells.cl ${CMAKE_CURRENT_BINARY_DIR}/kernel/computeLayerCells.cl COPYONLY)

@@ -44,8 +44,8 @@ struct DeviceProperties final
     cl::CommandQueue oclQueue;
 
     //kernel
-    cl::Kernel oclCountKernel;
-    cl::Kernel oclComputeKernel;
+    cl::Kernel oclCountTrackletKernel;
+    cl::Kernel oclComputeTrackletKernel;
 
 };
 

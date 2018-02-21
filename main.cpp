@@ -39,11 +39,6 @@ int main(int argc, char** argv)
 	std::cout<<">> CPU"<<std::endl;
 #endif
 
-	std::vector<cl::Platform> platformList;
-	// Get the list of platform
-	cl::Platform::get(&platformList);
-return 2;
-
   if (argv[1] == NULL) {
 
     std::cerr << "Please, provide a data file." << std::endl;
@@ -132,7 +127,7 @@ return 1;
         minTime = diff;
       if (maxTime < diff)
         maxTime = diff;
-
+/*
       for(int iVertex = 0; iVertex < currentEvent.getPrimaryVerticesNum(); ++iVertex) {
 
         std::cout << "Found " << roads[iVertex].size() << " roads for vertex " << iVertex + 1 << std::endl;
@@ -152,7 +147,7 @@ return 1;
         IOUtils::writeRoadsReport(correctRoadsOutputStream, duplicateRoadsOutputStream, fakeRoadsOutputStream, roads,
             labelsMap[iEvent]);
       }
-
+*/
     } catch (std::exception& e) {
 
       std::cout << e.what() << std::endl;

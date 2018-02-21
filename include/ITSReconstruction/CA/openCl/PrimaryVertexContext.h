@@ -56,7 +56,7 @@ class PrimaryVertexContext
 
      cl::Buffer bLayerIndex[Constants::ITS::LayersNumber];
 
-     ClusterStruct* mClusters[Constants::ITS::LayersNumber];
+     ClusterStruct* mClusters[Constants::ITS::LayersNumber]={NULL};
      cl::Buffer bClusters[Constants::ITS::LayersNumber];
      cl::Buffer bClustersSize;
      int iClusterSize[Constants::ITS::LayersNumber];
@@ -67,13 +67,13 @@ class PrimaryVertexContext
      cl::Buffer bIndexTables[Constants::ITS::TrackletsPerRoad];
 
 
-     TrackletStruct* mTracklets[Constants::ITS::TrackletsPerRoad];
+     TrackletStruct* mTracklets[Constants::ITS::TrackletsPerRoad]={NULL};
      cl::Buffer bTracklets[Constants::ITS::TrackletsPerRoad];
      int iTrackletSize[Constants::ITS::TrackletsPerRoad];
      int iTrackletAllocatedSize[Constants::ITS::TrackletsPerRoad];
      cl::Buffer bTrackletsSize;
 
-     int* mTrackletsLookupTable[Constants::ITS::CellsPerRoad];
+     int* mTrackletsLookupTable[Constants::ITS::CellsPerRoad]={NULL};
      int iTrackletsLookupTableSize[Constants::ITS::CellsPerRoad];
      int iTrackletsLookupTableAllocatedSize[Constants::ITS::CellsPerRoad];
      cl::Buffer bTrackletsLookupTable[Constants::ITS::CellsPerRoad];

@@ -251,8 +251,9 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
   for (int iVertex { 0 }; iVertex < verticesNum; ++iVertex) {
 
     mPrimaryVertexContext.initialize(event, iVertex);
-/*
+
     computeTracklets();
+/*
     computeCells();
     findCellsNeighbours();
     findTracks();
@@ -284,9 +285,9 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksVerbose(const Eve
     t2 = clock();
     diff = ((float) t2 - (float) t1) / (CLOCKS_PER_SEC / 1000);
     std::cout << std::setw(2) << " - Context initialized in: " << diff << "ms" << std::endl;
-/*
+
     evaluateTask(&Tracker<IsGPU>::computeTracklets, "Tracklets Finding");
-    evaluateTask(&Tracker<IsGPU>::computeCells, "Cells Finding");
+/*  evaluateTask(&Tracker<IsGPU>::computeCells, "Cells Finding");
     evaluateTask(&Tracker<IsGPU>::findCellsNeighbours, "Neighbours Finding");
     evaluateTask(&Tracker<IsGPU>::findTracks, "Tracks Finding");
     evaluateTask(&Tracker<IsGPU>::computeMontecarloLabels, "Computing Montecarlo Labels");
@@ -407,7 +408,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksTimeBenchmark(
 template<bool IsGPU>
 void Tracker<IsGPU>::computeTracklets()
 {
-  //Trait::computeLayerTracklets(mPrimaryVertexContext);
+  Trait::computeLayerTracklets(mPrimaryVertexContext);
 }
 
 template<bool IsGPU>
