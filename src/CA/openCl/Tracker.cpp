@@ -164,11 +164,13 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 #ifdef PRINT_TRACKLET_CNT
 			outfile<<"Layer:"<<iLayer<<" = "<<trackletsFound[iLayer]<<"\n";
 #endif
+			std::cout<<"Layer:"<<iLayer<<" = "<<trackletsFound[iLayer]<<std::endl;
 		}
 #ifdef PRINT_TRACKLET_CNT
 	  outfile<<"Total:"<<totalTrackletsFound<<"\n\n";
 	  outfile.close();
 #endif
+	  std::cout<<"Total:"<<totalTrackletsFound<<std::endl;
 	}catch (...) {
 		std::cout<<"Exception during compute cells phase"<<std::endl;
 		throw std::runtime_error { "Exception during compute cells phase" };
