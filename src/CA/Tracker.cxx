@@ -246,13 +246,18 @@ Tracker<IsGPU>::Tracker()
 template<bool IsGPU>
 std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& event)
 {
+	time_t t1,t2;
   const int verticesNum { event.getPrimaryVerticesNum() };
   std::vector<std::vector<Road>> roads { };
   roads.reserve(verticesNum);
 
   for (int iVertex { 0 }; iVertex < verticesNum; ++iVertex) {
-
+	  t1=clock();
     mPrimaryVertexContext.initialize(event, iVertex);
+    t2=clock();
+	float diff = ((float) t2 - (float) t1) / (CLOCKS_PER_SEC / 1000);
+	std::cout << std::setw(2) << "\t>Initialization completed in: " << diff << "ms" << std::endl;
+
 #ifdef PRINT_CLUSTERS
     std::ofstream outfile;
 	outfile.open("/home/frank/Scrivania/clusterOCL.txt", std::ios_base::app);
@@ -269,7 +274,7 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
 	outfile.close();
 
 #endif
-    computeTracklets();
+	evaluateTask(&Tracker<IsGPU>::computeTracklets, "Tracklets Finding");
 /*
     computeCells();
     findCellsNeighbours();

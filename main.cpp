@@ -72,9 +72,7 @@ void provaBoost(){
 	);
 
 	// sort data on the device
-	compute::sort(
-		device_vector.begin(), device_vector.end(), queue
-	);
+	compute::exclusive_scan(device_vector.begin(), device_vector.end(),device_vector.begin(),0 ,queue);
 
 	// copy data back to the host
 	compute::copy(
@@ -90,7 +88,7 @@ int main(int argc, char** argv)
 {
 
 	//provaBoost();
-	//return 1;
+
 #if TRACKINGITSU_OCL_MODE
 	std::cout<<">> OCL"<<std::endl;
 #elif TRACKINGITSU_CUDA_MODE
