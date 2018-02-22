@@ -8,7 +8,7 @@
 #include "ITSReconstruction/CA/IOUtils.h"
 #include "ITSReconstruction/CA/Tracker.h"
 
-#define PRINT_TRACKLET_CNT
+//#define PRINT_TRACKLET_CNT
 
 
 #if defined HAVE_VALGRIND
