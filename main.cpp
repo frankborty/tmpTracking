@@ -8,6 +8,8 @@
 #include "ITSReconstruction/CA/IOUtils.h"
 #include "ITSReconstruction/CA/Tracker.h"
 
+#include "boost/compute.hpp"
+
 //#define PRINT_TRACKLET_CNT
 
 
@@ -26,14 +28,69 @@
 
 using namespace o2::ITS::CA;
 
+namespace compute = boost::compute;
+
 std::string getDirectory(const std::string& fname)
 {
   size_t pos = fname.find_last_of("\\/");
   return (std::string::npos == pos) ? "" : fname.substr(0, pos + 1);
 }
 
+void provaBoost(){
+	// get the default compute device
+	compute::device gpu = compute::system::default_device();
+
+	// create a compute context and command queue
+	compute::context ctx(gpu);
+	compute::command_queue queue(ctx, gpu);
+
+	// generate random numbers on the host
+	std::vector<float> host_vector(10);
+
+	host_vector[0]=11;
+	host_vector[1]=5;
+	host_vector[2]=6;
+	host_vector[3]=2;
+	host_vector[4]=4;
+	host_vector[5]=12;
+	host_vector[6]=0;
+	host_vector[7]=9;
+	host_vector[8]=14;
+	host_vector[9]=7;
+
+	for(int i=0;i<10;i++)
+		std::cout<<host_vector[i]<<" ";
+
+	std::cout<<"\n"<<std::endl;
+
+	// create vector on the device
+	compute::vector<float> device_vector(10, ctx);
+
+	// copy data to the device
+	compute::copy(
+		host_vector.begin(), host_vector.end(), device_vector.begin(), queue
+	);
+
+	// sort data on the device
+	compute::sort(
+		device_vector.begin(), device_vector.end(), queue
+	);
+
+	// copy data back to the host
+	compute::copy(
+		device_vector.begin(), device_vector.end(), host_vector.begin(), queue
+	);
+	for(int i=0;i<10;i++)
+			std::cout<<host_vector[i]<<" ";
+
+	return;
+}
+
 int main(int argc, char** argv)
 {
+
+	//provaBoost();
+	//return 1;
 #if TRACKINGITSU_OCL_MODE
 	std::cout<<">> OCL"<<std::endl;
 #elif TRACKINGITSU_CUDA_MODE
