@@ -8,6 +8,9 @@
 #include "ITSReconstruction/CA/IOUtils.h"
 #include "ITSReconstruction/CA/Tracker.h"
 
+#define PRINT_TRACKLET_CNT
+
+
 #if defined HAVE_VALGRIND
 # include <valgrind/callgrind.h>
 #endif
@@ -86,13 +89,20 @@ int main(int argc, char** argv)
   // Prevent cold cache benchmark noise
   Tracker<TRACKINGITSU_GPU_MODE> tracker{};
   tracker.clustersToTracks(events[0]);
-return 1;
+
 #if defined GPU_PROFILING_MODE
   Utils::Host::gpuStartProfiler();
 #endif
 
   for (size_t iEvent = 0; iEvent < events.size(); ++iEvent) {
 
+#ifdef PRINT_TRACKLET_CNT
+	std::ofstream outfile;
+	outfile.open("/home/frank/Scrivania/trackFoundOCL.txt", std::ios_base::app);
+
+	outfile<<"Event #"<<iEvent<<"\n";
+	outfile.close();
+#endif
     Event& currentEvent = events[iEvent];
     std::cout << "Processing event " << iEvent + 1 << std::endl;
 

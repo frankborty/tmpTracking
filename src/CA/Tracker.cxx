@@ -12,6 +12,8 @@
 /// \brief 
 ///
 
+//#define PRINT_CLUSTERS
+//#define PRINT_TRACKLET
 #include "ITSReconstruction/CA/Tracker.h"
 
 #include <array>
@@ -251,7 +253,22 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
   for (int iVertex { 0 }; iVertex < verticesNum; ++iVertex) {
 
     mPrimaryVertexContext.initialize(event, iVertex);
+#ifdef PRINT_CLUSTERS
+    std::ofstream outfile;
+	outfile.open("/home/frank/Scrivania/clusterOCL.txt", std::ios_base::app);
+	outfile<<"clusterId\tindexTableBinIndex\tphiCoordinate\talphaAngle\n";
+	for(int i=0;i<7;i++){
+		outfile<<"Layer #"<<i<<"\n";
+		int size=mPrimaryVertexContext.mGPUContext.iClusterSize[i];
+		for(int j=0;j<size;j++){
+			ClusterStruct c=mPrimaryVertexContext.mGPUContext.mClusters[i][j];
+			outfile<<c.clusterId<<"\t"<<c.indexTableBinIndex<<"\t"<<c.phiCoordinate<<"\t"<<c.alphaAngle<<"\n";
+		}
+		outfile<<"\n\n";
+	}
+	outfile.close();
 
+#endif
     computeTracklets();
 /*
     computeCells();

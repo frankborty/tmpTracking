@@ -105,7 +105,7 @@ void PrimaryVertexContext::initialize(const Event& event, const int primaryVerte
 	mGPUContext.bClustersSize=cl::Buffer(
 		oclContext,
 		(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		6*sizeof(int),
+		7*sizeof(int),
 		(void *) mGPUContext.iClusterSize);
 
 

@@ -10,6 +10,9 @@
 ///
 ///
 
+#define PRINT_TRACKLET_CNT
+
+#include <unistd.h>
 
 #include "ITSReconstruction/CA/Definitions.h"
 #include <ITSReconstruction/CA/Tracklet.h>
@@ -74,6 +77,12 @@ void sortCellsKernel(PrimaryVertexContext& primaryVertexContext, const int layer
 template<>
 void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primaryVertexContext)
 {
+
+#ifdef PRINT_TRACKLET_CNT
+	std::ofstream outfile;
+	outfile.open("/home/frank/Scrivania/trackFoundOCL.txt", std::ios_base::app);
+#endif
+
 	std::cout<<"computeLayerTracklets"<<std::endl;
 	int iClustersNum;
 	int *firstLayerLookUpTable;
@@ -142,7 +151,6 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 				cl::NDRange(pseudoClusterNumber),
 				cl::NDRange(workgroupSize));
 				//cl::NullRange);
-
 			oclCommandqueues[iLayer].finish();
 
 			trackletsFound = (int *) oclCommandqueues[iLayer].enqueueMapBuffer(
@@ -150,14 +158,17 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 					CL_TRUE, // block
 					CL_MAP_READ,
 					0,
-					6*sizeof(int)
+					Constants::ITS::TrackletsPerRoad*sizeof(int)
 			);
 			totalTrackletsFound+=trackletsFound[iLayer];
-
-			std::cout<<"Tracklet layer "<<iLayer<<" = "<<trackletsFound[iLayer]<<std::endl;
-
+#ifdef PRINT_TRACKLET_CNT
+			outfile<<"Layer:"<<iLayer<<" = "<<trackletsFound[iLayer]<<"\n";
+#endif
 		}
-		std::cout<<"Tracklets totali "<<totalTrackletsFound<<std::endl;
+#ifdef PRINT_TRACKLET_CNT
+	  outfile<<"Total:"<<totalTrackletsFound<<"\n\n";
+	  outfile.close();
+#endif
 	}catch (...) {
 		std::cout<<"Exception during compute cells phase"<<std::endl;
 		throw std::runtime_error { "Exception during compute cells phase" };
