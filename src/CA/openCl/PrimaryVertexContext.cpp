@@ -56,19 +56,19 @@ void PrimaryVertexContext::initialize(cl::Context oclContext)
 		sizeof(int),
 		(void *) &(i));
 	}
-	int iTrackletsFoundForLayer[]={0,0,0,0,0,0,0};
+	int iTrackletsFoundForLayer[]={0,0,0,0,0,0};
 	this->bTrackletsFoundForLayer=cl::Buffer(
 		oclContext,
 		(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		o2::ITS::CA::Constants::ITS::LayersNumber*sizeof(int),
+		o2::ITS::CA::Constants::ITS::TrackletsPerRoad*sizeof(int),
 		(void *) iTrackletsFoundForLayer);
 
 	int iCellsFoundForLayer[]={0,0,0,0,0};
 	this->bCellsFoundForLayer=cl::Buffer(
 		oclContext,
-		(cl_mem_flags)CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR,
+		(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
 		o2::ITS::CA::Constants::ITS::CellsPerRoad*sizeof(int),
-		(void *) &(iCellsFoundForLayer[0]));
+		(void *) iCellsFoundForLayer);
 }
 
 }

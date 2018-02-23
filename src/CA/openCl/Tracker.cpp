@@ -13,7 +13,11 @@
 //#define PRINT_TRACKLET_CNT
 //#define PRINT_TRACKLET_LUT
 //#define PRINT_TRACKLET
-#define PRINT_TRACKLET_CNT_STDOUT
+//#define PRINT_TRACKLET_CNT_STDOUT
+
+//#define PRINT_CELL_CNT
+//#define PRINT_CELL_CNT_STDOUT
+
 #include <unistd.h>
 
 #include "ITSReconstruction/CA/Definitions.h"
@@ -24,6 +28,7 @@
 #include <ITSReconstruction/CA/Tracklet.h>
 #include "ITSReconstruction/CA/Definitions.h"
 #include "ITSReconstruction/CA/gpu/Vector.h"
+#include "ITSReconstruction/CA/openCl/Utils.h"
 #include "boost/compute.hpp"
 namespace compute = boost::compute;
 
@@ -64,7 +69,7 @@ void sortTrackletsKernel(PrimaryVertexContext& primaryVertexContext, const int l
 void layerCellsKernel(PrimaryVertexContext& primaryVertexContext, const int layerIndex,
     Vector<Cell> cellsVector)
 {
-//  computeLayerCells(primaryVertexContext, layerIndex, cellsVector);
+  computeLayerCells(primaryVertexContext, layerIndex, cellsVector);
 }
 
 
@@ -95,21 +100,15 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 	outfileLookTracklet.open("/home/frank/Scrivania/trackletOCL.txt", std::ios_base::app);
 #endif
 
-	std::cout<<"computeLayerTracklets"<<std::endl;
 	int iClustersNum;
 	int *firstLayerLookUpTable;
 	int* trackletsFound;
 	int totalTrackletsFound=0;
 	cl::Buffer bTrackletLookUpTable;
-	cl::CommandQueue oclCommandqueues[Constants::ITS::TrackletsPerRoad];
 	cl::Kernel oclCountTrackletKernel=GPU::Context::getInstance().getDeviceProperties().oclCountTrackletKernel;
 	cl::Kernel oclComputeTrackletKernel=GPU::Context::getInstance().getDeviceProperties().oclComputeTrackletKernel;
-
-
-
-
-
 	int workgroupSize=5*32;	//tmp value
+	time_t tx,ty;
 
 	try{
 		cl::Context oclContext=GPU::Context::getInstance().getDeviceProperties().oclContext;
@@ -122,9 +121,6 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 		compute::command_queue queue(ctx, device);
 	///
 
-		for(int i=0;i<Constants::ITS::TrackletsPerRoad;i++){
-			oclCommandqueues[i]=cl::CommandQueue(oclContext, oclDevice, 0);
-		}
 
 		iClustersNum=primaryVertexContext.mGPUContext.iClusterSize[0];
 
@@ -142,7 +138,7 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 				iClustersNum*sizeof(int),
 				(void *) &firstLayerLookUpTable[0]);
 
-		time_t tx,ty;
+
 		tx=clock();
 		for (int iLayer{ 0 }; iLayer<Constants::ITS::TrackletsPerRoad; ++iLayer) {
 			iClustersNum=primaryVertexContext.mGPUContext.iClusterSize[iLayer];
@@ -165,7 +161,7 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 			}
 
 //			time_t tx=clock();
-			oclCommandqueues[iLayer].enqueueNDRangeKernel(
+			GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueNDRangeKernel(
 				oclCountTrackletKernel,
 				cl::NullRange,
 				cl::NDRange(pseudoClusterNumber),
@@ -183,11 +179,11 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 */
 			//std::cout<<"Layer:"<<iLayer<<" = "<<trackletsFound[iLayer]<<std::endl;
 		}
-
+		free(firstLayerLookUpTable);
 #ifdef PRINT_TRACKLET_CNT_STDOUT
 		for(int i=0;i<Constants::ITS::TrackletsPerRoad;i++)
-			oclCommandqueues[i].finish();
-		trackletsFound = (int *) oclCommandqueues[Constants::ITS::TrackletsPerRoad-1].enqueueMapBuffer(
+			GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[i].finish();
+		trackletsFound = (int *) GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[Constants::ITS::TrackletsPerRoad-1].enqueueMapBuffer(
 				primaryVertexContext.mGPUContext.bTrackletsFoundForLayer,
 				CL_TRUE, // block
 				CL_MAP_READ,
@@ -213,10 +209,10 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 	tx=clock();
 	for (int iLayer { 0 }; iLayer<Constants::ITS::TrackletsPerRoad; ++iLayer) {
 		iClustersNum=primaryVertexContext.mGPUContext.iClusterSize[iLayer];
-		oclCommandqueues[iLayer].finish();
+		GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].finish();
 
 		if(iLayer==0){
-			int* lookUpFound = (int *) oclCommandqueues[iLayer].enqueueMapBuffer(
+			int* lookUpFound = (int *) GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueMapBuffer(
 				bTrackletLookUpTable,
 				CL_TRUE, // block
 				CL_MAP_READ,
@@ -251,7 +247,7 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 		}
 		else{
 
-			int* lookUpFound = (int *) oclCommandqueues[iLayer].enqueueMapBuffer(
+			int* lookUpFound = (int *) GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueMapBuffer(
 				primaryVertexContext.mGPUContext.bTrackletsLookupTable[iLayer-1],
 				CL_TRUE, // block
 				CL_MAP_READ,
@@ -284,14 +280,9 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 				outfileLookUp<<j<<"\t"<<lookUpFound[j]<<"\n";
 			outfileLookUp<<"\n";
 #endif
+
+
 #ifdef PRINT_TRACKLET
-			trackletsFound = (int *) oclCommandqueues[iLayer].enqueueMapBuffer(
-					primaryVertexContext.mGPUContext.bTrackletsFoundForLayer,
-					CL_TRUE, // block
-					CL_MAP_READ,
-					0,
-					Constants::ITS::TrackletsPerRoad*sizeof(int)
-			);
 			for(int i=0;i<Constants::ITS::TrackletsPerRoad;i++)
 				totalTrackletsFound+=trackletsFound[iLayer];
 
@@ -302,9 +293,16 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 	time = ((float) ty - (float) tx) / (CLOCKS_PER_SEC / 1000);
 	std::cout<< "\t>Total scan time = "<<time<<" ms" << std::endl;
 
-
-
-
+	trackletsFound = (int *) oclCommandQueue.enqueueMapBuffer(
+			primaryVertexContext.mGPUContext.bTrackletsFoundForLayer,
+			CL_TRUE, // block
+			CL_MAP_READ,
+			0,
+			Constants::ITS::TrackletsPerRoad*sizeof(int)
+	);
+	for(int i=0;i<Constants::ITS::TrackletsPerRoad;i++){
+		primaryVertexContext.mGPUContext.iTrackletFoundPerLayer[i]=trackletsFound[i];
+	}
 
 	//calcolo le tracklet
 	tx=clock();
@@ -330,7 +328,8 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 		}
 
 
-		oclCommandqueues[iLayer].enqueueNDRangeKernel(
+
+		GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueNDRangeKernel(
 			oclComputeTrackletKernel,
 			cl::NullRange,
 			cl::NDRange(pseudoClusterNumber),
@@ -339,7 +338,7 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 #ifdef PRINT_TRACKLET
 
 
-		TrackletStruct* output = (TrackletStruct *) oclCommandqueues[iLayer].enqueueMapBuffer(
+		TrackletStruct* output = (TrackletStruct *) GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueMapBuffer(
 			primaryVertexContext.mGPUContext.bTracklets[iLayer],
 			CL_TRUE, // block
 			CL_MAP_READ,
@@ -353,6 +352,8 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 #endif
 
 
+
+
 	}
 	ty=clock();
 	time = ((float) ty - (float) tx) / (CLOCKS_PER_SEC / 1000);
@@ -364,10 +365,124 @@ void TrackerTraits<true>::computeLayerTracklets(CA::PrimaryVertexContext& primar
 		std::cout<<"Exception during compute cells phase"<<std::endl;
 		throw std::runtime_error { "Exception during compute cells phase" };
 	}
-
-
-
 }
+
+template<>
+void TrackerTraits<true>::computeLayerCells(CA::PrimaryVertexContext& primaryVertexContext)
+{
+#ifdef PRINT_CELL_CNT
+	std::ofstream outfile;
+	outfile.open("/home/frank/Scrivania/cellFoundOCL.txt", std::ios_base::app);
+#endif
+	time_t tx,ty;
+	int iTrackletsNum;
+	int *firstLayerLookUpTable;
+	int* trackletsFound;
+	int totalCellsFound=0;
+	int *cellsFound;
+	cl::Buffer bCellLookUpTable;
+	cl::Kernel oclCountCellKernel=GPU::Context::getInstance().getDeviceProperties().oclCountCellKernel;
+	cl::Kernel oclComputeCellKernel=GPU::Context::getInstance().getDeviceProperties().oclComputeCellKernel;
+	int workgroupSize=5*32;
+	try{
+		cl::Context oclContext=GPU::Context::getInstance().getDeviceProperties().oclContext;
+		cl::Device oclDevice=GPU::Context::getInstance().getDeviceProperties().oclDevice;
+		cl::CommandQueue oclCommandQueue=GPU::Context::getInstance().getDeviceProperties().oclQueue;
+
+		iTrackletsNum=primaryVertexContext.mGPUContext.iTrackletFoundPerLayer[0];
+
+		int pseudoTracletsNumber=iTrackletsNum;
+		if((pseudoTracletsNumber % workgroupSize)!=0){
+			int mult=pseudoTracletsNumber/workgroupSize;
+			pseudoTracletsNumber=(mult+1)*workgroupSize;
+		}
+		firstLayerLookUpTable = new int[pseudoTracletsNumber];
+
+		//std::fill(firstLayerLookUpTable,firstLayerLookUpTable+pseudoTracletsNumber,-1);
+		memset(firstLayerLookUpTable,-1,pseudoTracletsNumber*sizeof(int));
+		bCellLookUpTable = cl::Buffer(
+			oclContext,
+			(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+			pseudoTracletsNumber*sizeof(int),
+			(void *) &firstLayerLookUpTable[0]);
+
+
+		for (int iLayer { 0 }; iLayer < Constants::ITS::CellsPerRoad;++iLayer) {
+			std::cout<<"iLayer: "<<iLayer<<std::endl;
+			oclCountCellKernel.setArg(0, primaryVertexContext.mGPUContext.bPrimaryVertex);  //0 fPrimaryVertex
+			oclCountCellKernel.setArg(1, primaryVertexContext.mGPUContext.bLayerIndex[iLayer]); //1 iCurrentLayer
+			oclCountCellKernel.setArg(2, primaryVertexContext.mGPUContext.bTrackletsFoundForLayer);  //2 iLayerTrackletSize
+			oclCountCellKernel.setArg(3, primaryVertexContext.mGPUContext.bTracklets[iLayer]); //3  currentLayerTracklets
+			oclCountCellKernel.setArg(4, primaryVertexContext.mGPUContext.bTracklets[iLayer+1]); //4 nextLayerTracklets				oclCountCellKernel.setArg(5, primaryVertexContext.mGPUContext.bTracklets[iLayer+2]); //5 next2LayerTracklets
+			oclCountCellKernel.setArg(5, primaryVertexContext.mGPUContext.bClusters[iLayer]);  //5 currentLayerClusters
+			oclCountCellKernel.setArg(6, primaryVertexContext.mGPUContext.bClusters[iLayer+1]);//6 nextLayerClusters
+			oclCountCellKernel.setArg(7, primaryVertexContext.mGPUContext.bClusters[iLayer+2]);//7 next2LayerClusters
+			oclCountCellKernel.setArg(8, primaryVertexContext.mGPUContext.bTrackletsLookupTable[iLayer]);//8  currentLayerTrackletsLookupTable
+
+			if(iLayer==0)
+				oclCountCellKernel.setArg(9, bCellLookUpTable);//9iCellsPerTrackletPreviousLayer;
+			else
+				oclCountCellKernel.setArg(9, primaryVertexContext.mGPUContext.bCellsLookupTable[iLayer-1]);//9iCellsPerTrackletPreviousLayer
+			oclCountCellKernel.setArg(10, primaryVertexContext.mGPUContext.bCellsFoundForLayer);
+
+
+			int pseudoTrackletsNumber=primaryVertexContext.mGPUContext.iTrackletFoundPerLayer[iLayer];
+			if((pseudoTrackletsNumber % workgroupSize)!=0){
+				int mult=pseudoTrackletsNumber/workgroupSize;
+				pseudoTrackletsNumber=(mult+1)*workgroupSize;
+			}
+
+			GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].finish();
+			GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[iLayer].enqueueNDRangeKernel(
+				oclCountCellKernel,
+				cl::NullRange,
+				cl::NDRange(pseudoTrackletsNumber),
+				cl::NDRange(workgroupSize));
+
+		}
+
+		delete []firstLayerLookUpTable;
+#ifdef PRINT_CELL_CNT_STDOUT
+		for(int i=0;i<Constants::ITS::CellsPerRoad;i++){
+			GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[i].finish();
+
+			cellsFound = (int *) GPU::Context::getInstance().getDeviceProperties().oclCommandQueues[i].enqueueMapBuffer(
+				primaryVertexContext.mGPUContext.bCellsFoundForLayer,
+				CL_TRUE, // block
+				CL_MAP_READ,
+				0,
+				Constants::ITS::CellsPerRoad*sizeof(int)
+		);
+		}
+		for(int i=0;i<Constants::ITS::CellsPerRoad;i++){
+			std::cout<<"Layer:"<<i<<" = "<<cellsFound[i]<<std::endl;
+			totalCellsFound+=cellsFound[i];
+		}
+		std::cout<<"Total:"<<totalCellsFound<<std::endl;
+#endif
+#ifdef PRINT_CELL_CNT
+	for(int i=0;i<Constants::ITS::CellsPerRoad;i++){
+		outfile<<"Layer:"<<i<<" = "<<cellsFound[i]<<"\n";
+	}
+	outfile<<"Total:"<<totalCellsFound<<"\n\n";
+	outfile.close();
+#endif
+
+
+	}catch(const cl::Error &err){
+		std::string errString=o2::ITS::CA::GPU::Utils::OCLErr_code(err.err());
+		//std::cout<< errString << std::endl;
+		throw std::runtime_error { errString };
+	}
+	catch( const std::exception & ex ) {
+	       throw std::runtime_error { ex.what() };
+	}
+  	catch (...) {
+		std::cout<<"Exception during compute cells phase"<<std::endl;
+		throw std::runtime_error { "Exception during compute cells phase" };
+	}
+}
+
 
 
 

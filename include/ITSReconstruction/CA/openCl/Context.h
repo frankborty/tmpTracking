@@ -41,11 +41,17 @@ struct DeviceProperties final
     std::size_t maxWorkItemDimension;
     cl::Context oclContext;
     cl::Device  oclDevice;
-    cl::CommandQueue oclQueue;
+
 
     //kernel
     cl::Kernel oclCountTrackletKernel;
     cl::Kernel oclComputeTrackletKernel;
+    cl::Kernel oclCountCellKernel;
+    cl::Kernel oclComputeCellKernel;
+
+    //command queues
+    cl::CommandQueue oclQueue;
+    cl::CommandQueue oclCommandQueues[Constants::ITS::TrackletsPerRoad];
 
 };
 

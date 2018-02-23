@@ -275,9 +275,9 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracks(const Event& eve
 
 #endif
 	evaluateTask(&Tracker<IsGPU>::computeTracklets, "Tracklets Finding");
-/*
-    computeCells();
-    findCellsNeighbours();
+	evaluateTask(&Tracker<IsGPU>::computeCells, "Cell Finding");
+
+/*  findCellsNeighbours();
     findTracks();
     computeMontecarloLabels();
 
@@ -309,8 +309,8 @@ std::vector<std::vector<Road>> Tracker<IsGPU>::clustersToTracksVerbose(const Eve
     std::cout << std::setw(2) << " - Context initialized in: " << diff << "ms" << std::endl;
 
     evaluateTask(&Tracker<IsGPU>::computeTracklets, "Tracklets Finding");
-/*  evaluateTask(&Tracker<IsGPU>::computeCells, "Cells Finding");
-    evaluateTask(&Tracker<IsGPU>::findCellsNeighbours, "Neighbours Finding");
+    evaluateTask(&Tracker<IsGPU>::computeCells, "Cells Finding");
+/*  evaluateTask(&Tracker<IsGPU>::findCellsNeighbours, "Neighbours Finding");
     evaluateTask(&Tracker<IsGPU>::findTracks, "Tracks Finding");
     evaluateTask(&Tracker<IsGPU>::computeMontecarloLabels, "Computing Montecarlo Labels");
 
@@ -436,7 +436,7 @@ void Tracker<IsGPU>::computeTracklets()
 template<bool IsGPU>
 void Tracker<IsGPU>::computeCells()
 {
-  //Trait::computeLayerCells(mPrimaryVertexContext);
+  Trait::computeLayerCells(mPrimaryVertexContext);
 }
 
 template<bool IsGPU>

@@ -143,7 +143,6 @@ Context::Context()
 		}
 		std::cout<<"Choose device:";
 		std::cin>>scelta;
-
 	}
 	catch(const cl::Error &err){
 		std::string errString=Utils::OCLErr_code(err.err());
@@ -153,16 +152,23 @@ Context::Context()
 
 	try{
 		mDeviceProperties[iCurrentDevice].oclQueue=cl::CommandQueue(mDeviceProperties[iCurrentDevice].oclContext, mDeviceProperties[iCurrentDevice].oclDevice, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE|CL_QUEUE_PROFILING_ENABLE );
-		//mDeviceProperties[iCurrentDevice].oclCountKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","countLayerTracklets");
-		//mDeviceProperties[iCurrentDevice].oclComputeKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./tmpTracking/src/CA/openCl/kernel/computeLayerTracklets.cl","computeLayerTracklets");
+
+		for(int i=0;i<Constants::ITS::TrackletsPerRoad;i++){
+			mDeviceProperties[iCurrentDevice].oclCommandQueues[i]=cl::CommandQueue(mDeviceProperties[iCurrentDevice].oclContext, mDeviceProperties[iCurrentDevice].oclDevice, 0);
+		}
+
 		mDeviceProperties[iCurrentDevice].oclCountTrackletKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./src/kernel/computeLayerTracklets.cl","countLayerTracklets");
 		mDeviceProperties[iCurrentDevice].oclComputeTrackletKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./src/kernel/computeLayerTracklets.cl","computeLayerTracklets");
+		mDeviceProperties[iCurrentDevice].oclCountCellKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./src/kernel/computeLayerCells.cl","countLayerCells");
+		mDeviceProperties[iCurrentDevice].oclComputeCellKernel=GPU::Utils::CreateKernelFromFile(mDeviceProperties[iCurrentDevice].oclContext,mDeviceProperties[iCurrentDevice].oclDevice,"./src/kernel/computeLayerCells.cl","computeLayerCells");
+
+
 
 	}catch(const cl::Error &err){
-			std::string errString=Utils::OCLErr_code(err.err());
-			//std::cout<< errString << std::endl;
-			throw std::runtime_error { errString };
-		}
+		std::string errString=Utils::OCLErr_code(err.err());
+		//std::cout<< errString << std::endl;
+		throw std::runtime_error { errString };
+	}
 
 
 }

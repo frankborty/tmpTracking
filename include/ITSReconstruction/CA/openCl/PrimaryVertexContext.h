@@ -70,6 +70,7 @@ class PrimaryVertexContext
      TrackletStruct* mTracklets[Constants::ITS::TrackletsPerRoad]={NULL};
      cl::Buffer bTracklets[Constants::ITS::TrackletsPerRoad];
      int iTrackletSize[Constants::ITS::TrackletsPerRoad];
+     int iTrackletFoundPerLayer[Constants::ITS::TrackletsPerRoad];
      int iTrackletAllocatedSize[Constants::ITS::TrackletsPerRoad];
      cl::Buffer bTrackletsSize;
 
@@ -88,18 +89,17 @@ class PrimaryVertexContext
      //std::array<std::vector<Cluster>, Constants::ITS::LayersNumber> mClustersVector;
 
      ////// cells //////
-     CellStruct* mCells[Constants::ITS::CellsPerRoad];
+     CellStruct* mCells[Constants::ITS::CellsPerRoad]={NULL};
      cl::Buffer bCells[Constants::ITS::CellsPerRoad];
      int iCellSize[Constants::ITS::CellsPerRoad];
-     //int iTrackletAllocatedSize[Constants::ITS::TrackletsPerRoad];
      cl::Buffer bCellSize;
 
-     int *iCellsLookupTable[Constants::ITS::CellsPerRoad-1];
+     int *iCellsLookupTable[Constants::ITS::CellsPerRoad-1]={NULL};
      cl::Buffer bCellsLookupTable[Constants::ITS::CellsPerRoad-1];
 	 int iCellsLookupTableSize[Constants::ITS::CellsPerRoad-1];
 	 cl::Buffer bCellsLookupTableSize;
 
-	 int *mCellsNeighbours[Constants::ITS::CellsPerRoad - 1];
+	 int *mCellsNeighbours[Constants::ITS::CellsPerRoad - 1]={NULL};
 
   };
 

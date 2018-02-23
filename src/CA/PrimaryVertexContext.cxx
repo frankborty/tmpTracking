@@ -99,6 +99,54 @@ void PrimaryVertexContext::initialize(const Event& event, const int primaryVerte
 			clusterSize,
 			(void *) mGPUContext.mClusters[iLayer]);
 
+		if(iLayer < Constants::ITS::CellsPerRoad) {
+			if(mGPUContext.mCells[iLayer]!=NULL)
+				free(mGPUContext.mCells[iLayer]);
+
+
+			mCells[iLayer].clear();
+			float cellsMemorySize = std::ceil(((Constants::Memory::CellsMemoryCoefficients[iLayer] * event.getLayer(iLayer).getClustersSize())
+			 * event.getLayer(iLayer + 1).getClustersSize()) * event.getLayer(iLayer + 2).getClustersSize());
+			mCells[iLayer].reserve(cellsMemorySize);
+
+			int cellSize=cellsMemorySize*sizeof(CellStruct);
+			mGPUContext.iCellSize[iLayer]=cellsMemorySize;
+			mGPUContext.mCells[iLayer]=(CellStruct*)malloc(cellSize);
+			mGPUContext.bCells[iLayer]=cl::Buffer(
+				oclContext,
+				(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+				cellSize,
+				(void *) mGPUContext.mCells[iLayer]);
+		}
+
+		if(iLayer < Constants::ITS::CellsPerRoad - 1) {
+			//mCellsLookupTable[iLayer].clear();
+			if(mGPUContext.iCellsLookupTable[iLayer]!=NULL)
+				free(mGPUContext.iCellsLookupTable[iLayer]);
+
+			int cellsLookupTableMemorySize=std::ceil((Constants::Memory::TrackletsMemoryCoefficients[iLayer + 1] * event.getLayer(iLayer + 1).getClustersSize())
+			* event.getLayer(iLayer + 2).getClustersSize());
+
+
+			int CellsLookupTableSize=cellsLookupTableMemorySize*sizeof(int);
+			mGPUContext.iCellsLookupTableSize[iLayer]=cellsLookupTableMemorySize;
+			mGPUContext.iCellsLookupTable[iLayer]=(int*)malloc(CellsLookupTableSize);
+
+			mGPUContext.bCellsLookupTable[iLayer]=cl::Buffer(
+				oclContext,
+				(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+				CellsLookupTableSize,
+				(void *) mGPUContext.iCellsLookupTable[iLayer]);
+
+			if(iLayer < Constants::ITS::CellsPerRoad - 1) {
+				mCellsLookupTable[iLayer].clear();
+				mCellsLookupTable[iLayer].resize(cellsLookupTableMemorySize);
+
+				mCellsNeighbours[iLayer].clear();
+			}
+		}
+
+
 	}
 
 
@@ -156,6 +204,30 @@ void PrimaryVertexContext::initialize(const Event& event, const int primaryVerte
 				(void *) mGPUContext.mTracklets[iLayer]);
 
 		}
+
+		//// cells
+		if(iLayer < Constants::ITS::CellsPerRoad) {
+			if(mGPUContext.mCells[iLayer]!=NULL)
+				free(mGPUContext.mCells[iLayer]);
+
+
+			mCells[iLayer].clear();
+			float cellsMemorySize = std::ceil(((Constants::Memory::CellsMemoryCoefficients[iLayer] * event.getLayer(iLayer).getClustersSize())
+			 * event.getLayer(iLayer + 1).getClustersSize()) * event.getLayer(iLayer + 2).getClustersSize());
+			mCells[iLayer].reserve(cellsMemorySize);
+
+			int cellSize=cellsMemorySize*sizeof(CellStruct);
+			mGPUContext.iCellSize[iLayer]=cellsMemorySize;
+			mGPUContext.mCells[iLayer]=(CellStruct*)malloc(cellSize);
+			mGPUContext.bCells[iLayer]=cl::Buffer(
+				oclContext,
+				(cl_mem_flags)CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+				cellSize,
+				(void *) mGPUContext.mCells[iLayer]);
+
+		}
+
+
 		//tracklets lookup
 		if(iLayer < Constants::ITS::CellsPerRoad) {
 
@@ -176,8 +248,6 @@ void PrimaryVertexContext::initialize(const Event& event, const int primaryVerte
 				lookUpSize,
 				(void *) mGPUContext.mTrackletsLookupTable[iLayer]);
 		}
-
-
 	}
 //		//// cells
 //		if(iLayer < Constants::ITS::CellsPerRoad) {
