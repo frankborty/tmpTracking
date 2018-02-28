@@ -9,8 +9,6 @@
 #include "ITSReconstruction/CA/Tracker.h"
 
 
-//#define PRINT_TRACKLET_CNT
-//#define PRINT_CELL_CNT
 
 #if defined HAVE_VALGRIND
 # include <valgrind/callgrind.h>
@@ -101,21 +99,6 @@ int main(int argc, char** argv)
 #endif
 
   for (size_t iEvent = 0; iEvent < events.size(); ++iEvent) {
-
-#ifdef PRINT_TRACKLET_CNT
-	std::ofstream outfile;
-	outfile.open("/home/frank/Scrivania/trackFoundOCL.txt", std::ios_base::app);
-
-	outfile<<"Event #"<<iEvent<<"\n";
-	outfile.close();
-#endif
-#ifdef PRINT_CELL_CNT
-	std::ofstream outfile;
-	outfile.open("/home/frank/Scrivania/cellFoundOCL.txt", std::ios_base::app);
-
-	outfile<<"Event #"<<iEvent<<"\n";
-	outfile.close();
-#endif
     Event& currentEvent = events[iEvent];
     std::cout << "Processing event " << iEvent + 1 << std::endl;
 

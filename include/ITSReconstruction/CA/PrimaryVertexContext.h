@@ -85,7 +85,12 @@ class PrimaryVertexContext
         float3 mPrimaryVertex;
         std::array<std::vector<Cluster>, Constants::ITS::LayersNumber> mClusters;
         std::array<std::vector<Cell>, Constants::ITS::CellsPerRoad> mCells;
+#if TRACKINGITSU_OCL_MODE
+      public:
         std::array<std::vector<int>, Constants::ITS::CellsPerRoad - 1> mCellsLookupTable;
+#elif
+        std::array<std::vector<int>, Constants::ITS::CellsPerRoad - 1> mCellsLookupTable;
+#endif
         std::array<std::vector<std::vector<int>>, Constants::ITS::CellsPerRoad - 1> mCellsNeighbours;
         std::vector<Road> mRoads;
 
