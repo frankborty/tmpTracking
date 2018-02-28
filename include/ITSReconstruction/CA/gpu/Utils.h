@@ -45,6 +45,14 @@ void gpuMemcpyDeviceToHost(void *, const void *, int);
 void gpuStartProfiler();
 void gpuStopProfiler();
 }
+#if TRACKINGITSU_OCL_MODE
+int findNearestDivisor(const int numToRound, const int divisor);
+		int roundUp(const int numToRound, const int multiple);
+		char *OCLErr_code (int err_in);
+		cl::Kernel CreateKernelFromFile(cl::Context, cl::Device device, const char* fileName, const char* kernelName);
+#endif
+
+
 
 namespace Device {
 GPU_DEVICE int getLaneIndex();

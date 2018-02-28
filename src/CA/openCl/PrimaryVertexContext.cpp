@@ -20,7 +20,7 @@
 #include <iostream>
 #include <algorithm>
 #include "ITSReconstruction/CA/Definitions.h"
-#include "ITSReconstruction/CA/openCl/PrimaryVertexContext.h"
+#include "ITSReconstruction/CA/gpu/PrimaryVertexContext.h"
 
 namespace o2
 {

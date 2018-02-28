@@ -11,9 +11,10 @@
 /// \file CAGPUtils.cu
 /// \brief
 ///
-
+#include <string>
+#include <vector>
 #include "ITSReconstruction/CA/openCl/Utils.h"
-#include "ITSReconstruction/CA/openCl/Context.h"
+#include "ITSReconstruction/CA/gpu/Context.h"
 
 #include <sstream>
 #include <stdexcept>

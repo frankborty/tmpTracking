@@ -12,8 +12,8 @@
 /// \brief
 ///
 
-
-#include "ITSReconstruction/CA/openCl/Context.h"
+#include "ITSReconstruction/CA/Definitions.h"
+#include "ITSReconstruction/CA/gpu/Context.h"
 #include "ITSReconstruction/CA/openCl/Utils.h"
 
 #define AMD_WAVEFRONT 		0x4043

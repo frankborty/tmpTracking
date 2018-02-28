@@ -32,8 +32,8 @@
 	#include "ITSReconstruction/CA/gpu/UniquePointer.h"
 	#endif
 #if TRACKINGITSU_OCL_MODE
-	#include "ITSReconstruction/CA/openCl/PrimaryVertexContext.h"
-	#include "ITSReconstruction/CA/openCl/Context.h"
+	#include "ITSReconstruction/CA/gpu/PrimaryVertexContext.h"
+	#include "ITSReconstruction/CA/gpu/Context.h"
 #endif
 
 namespace o2
